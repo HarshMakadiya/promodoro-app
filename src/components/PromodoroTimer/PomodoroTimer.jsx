@@ -18,40 +18,14 @@ function PomodoroTimer({ isLoggedIn }) {
   }, []);
 
   useEffect(() => {
-    setWorkTime(defaultWorkTime);
-    setBreakTime(defaultBreakTime);
+    if (!isLoggedIn) {
+      setWorkTime(defaultWorkTime);
+      setBreakTime(defaultBreakTime);
+    } else {
+      setWorkTime(localStorage.getItem("worktime"));
+      setBreakTime(localStorage.getItem("breaktime"));
+    }
   }, [isLoggedIn]);
-
-  //   const test = async () => {
-  //     try {
-  //       const docRef = doc(db, "timers","MVdsIY5Eoy9cxsGkQVOc");
-  //       const res = await getDoc(docRef);
-  //       console.log(res.data());
-  //     } catch (error) {
-  //       console.error("Error updating Firestore:", error);
-  //     }
-  //   };
-  //   useEffect(() => {
-  // test();
-  // console.log(useFirestore)
-  //   }, []);
-  // Function to update Firestore with timer data
-  //   const updateFirestore = async () => {
-  //     try {
-  //       await firestore.collection('timers').doc('timerId').update({
-  //         workTime,
-  //         breakTime,
-  //       });
-  //     } catch (error) {
-  //       console.error('Error updating Firestore:', error);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  // Update Firestore when workTime or breakTime changes
-  // updateFirestore();
-  //   }, [workTime, breakTime]);
-
   // Timer logic
   useEffect(() => {
     let interval;
@@ -93,7 +67,14 @@ function PomodoroTimer({ isLoggedIn }) {
       .toString()
       .padStart(2, "0")}`;
   };
-
+  const handleReset = () => {
+    setIsRunning(false);
+    setIsWorking(true);
+    setWorkTime(defaultWorkTime);
+    setBreakTime(defaultBreakTime);
+    localStorage.setItem("worktime", defaultWorkTime);
+    localStorage.setItem("breaktime", defaultBreakTime);
+  };
   return (
     <div className="bg-gray-100 h-full">
       {!isLoggedIn ? (
@@ -127,6 +108,14 @@ function PomodoroTimer({ isLoggedIn }) {
               >
                 {isRunning ? "Pause" : "Start"}
               </button>
+
+              <button
+                className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+
               <button
                 className="bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
                 onClick={() => setIsWorking(!isWorking)}
